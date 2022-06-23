@@ -1,10 +1,10 @@
 {
   "name": "@secrets/graphlib",
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "A directed and undirected multi-graph library",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/graphlib.esm.js",
   "files": [
     "index.js",
     "dist/",
