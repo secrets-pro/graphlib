@@ -1,4 +1,4 @@
-import * as _  from "lodash";
+import * as _ from "lodash";
 
 var DEFAULT_EDGE_NAME = "\x00";
 var GRAPH_NODE = "\x00";
@@ -34,13 +34,14 @@ export class Graph {
   private _isCompound: boolean;
 
   // Label for the graph itself
-  private _label?; string;
+  private _label?;
+  string;
 
   // Defaults to be set when creating a new node
-  private _defaultNodeLabelFn = _.constant(undefined);
+  private _defaultNodeLabelFn: any;
 
   // Defaults to be set when creating a new edge
-  private _defaultEdgeLabelFn = _.constant(undefined);
+  private _defaultEdgeLabelFn: any;
 
   // v -> label
   private _nodes = {};
@@ -88,8 +89,7 @@ export class Graph {
     }
   }
 
-
-/* === Graph functions ========= */
+  /* === Graph functions ========= */
 
   /**
    * Whether graph was created with 'directed' flag set to true or not.
@@ -127,8 +127,7 @@ export class Graph {
     return this._label;
   }
 
-
-/* === Node functions ========== */
+  /* === Node functions ========== */
 
   /**
    * Sets the default node label. If newDefault is a function, it will be
@@ -168,7 +167,7 @@ export class Graph {
    */
   sources(): string[] {
     var self = this;
-    return _.filter(this.nodes(), function(v) {
+    return _.filter(this.nodes(), function (v) {
       return _.isEmpty(self._in[v]);
     });
   }
@@ -179,7 +178,7 @@ export class Graph {
    */
   sinks(): string[] {
     var self = this;
-    return _.filter(this.nodes(), function(v) {
+    return _.filter(this.nodes(), function (v) {
       return _.isEmpty(self._out[v]);
     });
   }
@@ -191,7 +190,7 @@ export class Graph {
   setNodes(vs: string[], value?: string): Graph {
     var args = arguments;
     var self = this;
-    _.each(vs, function(v) {
+    _.each(vs, function (v) {
       if (args.length > 1) {
         self.setNode(v, value);
       } else {
@@ -253,12 +252,14 @@ export class Graph {
   removeNode(v: string): Graph {
     var self = this;
     if (_.has(this._nodes, v)) {
-      var removeEdge = function(e) { self.removeEdge(self._edgeObjs[e]); };
+      var removeEdge = function (e) {
+        self.removeEdge(self._edgeObjs[e]);
+      };
       delete this._nodes[v];
       if (this._isCompound) {
         this._removeFromParentsChildList(v);
         delete this._parent![v];
-        _.each(this.children(v), function(child) {
+        _.each(this.children(v), function (child) {
           self.setParent(child);
         });
         delete this._children![v];
@@ -290,12 +291,15 @@ export class Graph {
     } else {
       // Coerce parent to string
       parent += "";
-      for (var ancestor = parent;
+      for (
+        var ancestor = parent;
         !_.isUndefined(ancestor);
-        ancestor = (this.parent(ancestor as string) as string)) {
+        ancestor = this.parent(ancestor as string) as string
+      ) {
         if (ancestor === v) {
-          throw new Error("Setting " + parent+ " as parent of " + v +
-            " would create a cycle");
+          throw new Error(
+            "Setting " + parent + " as parent of " + v + " would create a cycle"
+          );
         }
       }
 
@@ -317,7 +321,7 @@ export class Graph {
    * Gets parent node for node v.
    * Complexity: O(1).
    */
-  parent(v: string): string|void {
+  parent(v: string): string | void {
     if (this._isCompound) {
       var parent = this._parent![v];
       if (parent !== GRAPH_NODE) {
@@ -330,7 +334,7 @@ export class Graph {
    * Gets list of direct children of node v.
    * Complexity: O(1).
    */
-  children(v?: string): string[] | void {
+  children(v?: string): string[] {
     if (_.isUndefined(v)) {
       v = GRAPH_NODE;
     }
@@ -345,8 +349,7 @@ export class Graph {
     } else if (this.hasNode(v!)) {
       return [];
     }
-
-    return;
+    return [];
   }
 
   /**
@@ -354,11 +357,12 @@ export class Graph {
    * the graph. Behavior is undefined for undirected graphs - use neighbors instead.
    * Complexity: O(|V|).
    */
-  predecessors(v: string): string[] | void {
+  predecessors(v: string): string[] {
     var predsV = this._preds[v];
     if (predsV) {
       return _.keys(predsV);
     }
+    return [];
   }
 
   /**
@@ -366,11 +370,12 @@ export class Graph {
    * the graph. Behavior is undefined for undirected graphs - use neighbors instead.
    * Complexity: O(|V|).
    */
-  successors(v: string): string[] | void {
+  successors(v: string): string[] {
     var sucsV = this._sucs[v];
     if (sucsV) {
       return _.keys(sucsV);
     }
+    return [];
   }
 
   /**
@@ -411,13 +416,13 @@ export class Graph {
     copy.setGraph(this.graph());
 
     var self = this;
-    _.each(this._nodes, function(value, v) {
+    _.each(this._nodes, function (value, v) {
       if (filter(v)) {
         copy.setNode(v, value);
       }
     });
 
-    _.each(this._edgeObjs, function(e) {
+    _.each(this._edgeObjs, function (e: { v: any; w: any }) {
       if (copy.hasNode(e.v) && copy.hasNode(e.w)) {
         copy.setEdge(e, self.edge(e));
       }
@@ -437,7 +442,7 @@ export class Graph {
     }
 
     if (this._isCompound) {
-      _.each(copy.nodes(), function(v) {
+      _.each(copy.nodes(), function (v) {
         copy.setParent(v, findParent(v));
       });
     }
@@ -445,7 +450,7 @@ export class Graph {
     return copy;
   }
 
-/* === Edge functions ========== */
+  /* === Edge functions ========== */
 
   /**
    * Sets the default edge label or factory function. This label will be
@@ -487,7 +492,7 @@ export class Graph {
   setPath(vs: string[], value?: any): Graph {
     var self = this;
     var args = arguments;
-    _.reduce(vs, function(v, w) {
+    _.reduce(vs, function (v, w) {
       if (args.length > 1) {
         self.setEdge(v, w, value);
       } else {
@@ -504,7 +509,12 @@ export class Graph {
    * supplied and the edge was created by this call then the default edge label will
    * be assigned. The name parameter is only useful with multigraphs.
    */
-  setEdge(vOrEdge: string|Edge, wOrValue: string|any, _label?: any, _name?: string): Graph {
+  setEdge(
+    vOrEdge: string | Edge,
+    wOrValue: string | any,
+    _label?: any,
+    _name?: string
+  ): Graph {
     var v, w, name, value;
     var valueSpecified = false;
     var arg0 = arguments[0];
@@ -550,7 +560,9 @@ export class Graph {
     this.setNode(v);
     this.setNode(w);
 
-    this._edgeLabels[e] = valueSpecified ? value : this._defaultEdgeLabelFn(v, w, name);
+    this._edgeLabels[e] = valueSpecified
+      ? value
+      : this._defaultEdgeLabelFn(v, w, name);
 
     var edgeObj = edgeArgsToObj(this._isDirected, v, w, name);
     // Ensure we add undirected edges in a consistent way.
@@ -571,10 +583,11 @@ export class Graph {
    * Gets the label for the specified edge.
    * Complexity: O(1).
    */
-  edge(vOrEdge: string|Edge, w?: string, name?: string): any {
-    var e = (arguments.length === 1
-      ? edgeObjToId(this._isDirected, arguments[0])
-      : edgeArgsToId(this._isDirected, vOrEdge, w, name));
+  edge(vOrEdge: string | Edge, w?: string, name?: string): any {
+    var e =
+      arguments.length === 1
+        ? edgeObjToId(this._isDirected, arguments[0])
+        : edgeArgsToId(this._isDirected, vOrEdge, w, name);
     return this._edgeLabels[e];
   }
 
@@ -582,10 +595,11 @@ export class Graph {
    * Detects whether the graph contains specified edge or not. No subgraphs are considered.
    * Complexity: O(1).
    */
-  hasEdge(vOrEdge: string|Edge, w: string, name?: string): boolean {
-    var e = (arguments.length === 1
-      ? edgeObjToId(this._isDirected, arguments[0])
-      : edgeArgsToId(this._isDirected, vOrEdge, w, name));
+  hasEdge(vOrEdge: string | Edge, w: string, name?: string): boolean {
+    var e =
+      arguments.length === 1
+        ? edgeObjToId(this._isDirected, arguments[0])
+        : edgeArgsToId(this._isDirected, vOrEdge, w, name);
     return _.has(this._edgeLabels, e);
   }
 
@@ -593,10 +607,11 @@ export class Graph {
    * Removes the specified edge from the graph. No subgraphs are considered.
    * Complexity: O(1).
    */
-  removeEdge(vOrEdge: string|Edge, w?: string, name?: string): Graph {
-    var e = (arguments.length === 1
-      ? edgeObjToId(this._isDirected, arguments[0])
-      : edgeArgsToId(this._isDirected, vOrEdge, w, name));
+  removeEdge(vOrEdge: string | Edge, w?: string, name?: string): Graph {
+    var e =
+      arguments.length === 1
+        ? edgeObjToId(this._isDirected, arguments[0])
+        : edgeArgsToId(this._isDirected, vOrEdge, w, name);
     var edge = this._edgeObjs[e];
     if (edge) {
       const v = edge.v;
@@ -624,7 +639,9 @@ export class Graph {
       if (!u) {
         return edges;
       }
-      return _.filter(edges, function(edge) { return edge.v === u; });
+      return _.filter(edges, function (edge) {
+        return edge.v === u;
+      });
     }
   }
 
@@ -633,14 +650,16 @@ export class Graph {
    * those point to w. Behavior is undefined for undirected graphs - use nodeEdges instead.
    * Complexity: O(|E|).
    */
-  outEdges(v:string, w?: string): Edge[] | void {
+  outEdges(v: string, w?: string): Edge[] | void {
     var outV = this._out[v];
     if (outV) {
       var edges = _.values(outV);
       if (!w) {
         return edges;
       }
-      return _.filter(edges, function(edge) { return edge.w === w; });
+      return _.filter(edges, function (edge) {
+        return edge.w === w;
+      });
     }
   }
 
@@ -666,7 +685,9 @@ function incrementOrInitEntry(map, k) {
 }
 
 function decrementOrRemoveEntry(map, k) {
-  if (!--map[k]) { delete map[k]; }
+  if (!--map[k]) {
+    delete map[k];
+  }
 }
 
 function edgeArgsToId(isDirected, v_, w_, name) {
@@ -677,8 +698,13 @@ function edgeArgsToId(isDirected, v_, w_, name) {
     v = w;
     w = tmp;
   }
-  return v + EDGE_KEY_DELIM + w + EDGE_KEY_DELIM +
-             (_.isUndefined(name) ? DEFAULT_EDGE_NAME : name);
+  return (
+    v +
+    EDGE_KEY_DELIM +
+    w +
+    EDGE_KEY_DELIM +
+    (_.isUndefined(name) ? DEFAULT_EDGE_NAME : name)
+  );
 }
 
 function edgeArgsToObj(isDirected, v_, w_, name) {
@@ -689,7 +715,7 @@ function edgeArgsToObj(isDirected, v_, w_, name) {
     v = w;
     w = tmp;
   }
-  var edgeObj: Edge =  { v: v, w: w };
+  var edgeObj: Edge = { v: v, w: w };
   if (name) {
     edgeObj.name = name;
   }

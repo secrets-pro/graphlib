@@ -1,4 +1,4 @@
-import * as _  from "lodash";
+import * as _ from "lodash";
 import { Graph } from "../graph";
 
 export function components(g: Graph) {
@@ -14,7 +14,7 @@ export function components(g: Graph) {
     _.each(g.predecessors(v), dfs);
   }
 
-  _.each(g.nodes(), function(v) {
+  _.each(g.nodes(), function (v) {
     cmpt = [];
     dfs(v);
     if (cmpt.length) {

@@ -28,14 +28,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-var lib = require("./lib");
-
-module.exports = {
+import lib from "./lib";
+import alg from './lib/alg';
+import { read,write } from "./lib/json.ts";
+export default {
   Graph: lib.Graph,
   json: {
-    read: require("./compiled/lib/json.js").read,
-    write: require("./compiled/lib/json.js").write,
+    read,
+    write,
   },
-  alg: require("./lib/alg"),
+  alg,
   version: lib.version
 };

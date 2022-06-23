@@ -1,17 +1,17 @@
-import * as _  from "lodash";
+import * as _ from "lodash";
 import { Graph, GraphOptions } from "./graph";
 
 interface JsonGraph {
   options: GraphOptions;
   nodes: JsonNode[];
   edges: JsonEdge[];
-  value: string;
+  value: any;
 }
 
 interface JsonNode {
   v: string;
   value: string;
-  parent: string|void;
+  parent: string | void;
 }
 
 interface JsonEdge {
@@ -41,8 +41,8 @@ export function write(g: Graph): Object {
   return json;
 }
 
-function writeNodes(g: Graph): JsonNode[] {
-  return _.map(g.nodes(), function(v) {
+function writeNodes(g: Graph): any[] {
+  return _.map(g.nodes(), function (v) {
     var nodeValue = g.node(v);
     var parent = g.parent(v);
     var node: Partial<JsonNode> = { v: v };
@@ -56,8 +56,8 @@ function writeNodes(g: Graph): JsonNode[] {
   });
 }
 
-function writeEdges(g: Graph): JsonEdge[] {
-  return _.map(g.edges(), function(e) {
+function writeEdges(g: Graph): any[] {
+  return _.map(g.edges(), function (e) {
     var edgeValue = g.edge(e);
     var edge: Partial<JsonEdge> = { v: e.v, w: e.w };
     if (!_.isUndefined(e.name)) {
@@ -82,13 +82,13 @@ function writeEdges(g: Graph): JsonEdge[] {
  */
 export function read(json: JsonGraph): Graph {
   var g = new Graph(json.options).setGraph(json.value);
-  _.each(json.nodes, function(entry) {
+  _.each(json.nodes, function (entry) {
     g.setNode(entry.v, entry.value);
     if (entry.parent) {
       g.setParent(entry.v, entry.parent);
     }
   });
-  _.each(json.edges, function(entry) {
+  _.each(json.edges, function (entry) {
     g.setEdge({ v: entry.v, w: entry.w, name: entry.name }, entry.value);
   });
   return g;
