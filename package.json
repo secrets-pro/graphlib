@@ -4,7 +4,7 @@
   "description": "A directed and undirected multi-graph library",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "license": "MIT",
-  "main": "dist/graphlib.esm.js",
+  "main": "index.js",
   "files": [
     "index.js",
     "dist/",

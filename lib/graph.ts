@@ -213,8 +213,12 @@ export class Graph {
       }
       return this;
     }
-
-    this._nodes[v] = arguments.length > 1 ? value : this._defaultNodeLabelFn(v);
+    let defaultLableFn =
+      this._defaultNodeLabelFn ||
+      function (v) {
+        return v;
+      };
+    this._nodes[v] = arguments.length > 1 ? value : defaultLableFn(v);
     if (this._isCompound) {
       this._parent![v] = GRAPH_NODE;
       this._children![v] = {};
